@@ -1,0 +1,8 @@
+{
+    # Global options
+    admin off
+}
+
+msgpunk.com {
+    reverse_proxy msgpunk-server:8080
+}

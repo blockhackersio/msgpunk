@@ -1,0 +1,14 @@
+[Unit]
+Description=msgpunk-server
+After=network.target
+
+[Service]
+Type=simple
+User=deploy
+WorkingDirectory=/home/deploy/msgpunk
+ExecStart=/home/deploy/msgpunk/msgpunk-server
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
