@@ -25,7 +25,7 @@
 
   tasks = {
     "test:unit" = {
-      exec = "cd api && cargo test";
+      exec = "cargo test";
     };
     "dev:setup" = {
       exec = "./dev.sh setup";
