@@ -1,0 +1,9 @@
+{
+  "name": "test-vectors",
+  "private": true,
+  "type": "module",
+  "scripts": {},
+  "dependencies": {
+    "age-encryption": "^0.3.1"
+  }
+}

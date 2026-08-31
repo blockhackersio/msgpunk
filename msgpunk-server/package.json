@@ -1,5 +1,7 @@
 {
   "name": "msgpunk-server",
   "private": true,
-  "scripts": {}
+  "scripts": {
+    "test:flow": "bash scripts/test-flow.sh"
+  }
 }
