@@ -1,0 +1,36 @@
+{
+  "name": "@msgpunk/toolkit",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./aes-gcm": {
+      "types": "./src/aes-gcm.ts",
+      "default": "./dist/aes-gcm.js"
+    },
+    "./age": {
+      "types": "./src/age.ts",
+      "default": "./dist/age.js"
+    },
+    "./ed25519": {
+      "types": "./src/ed25519.ts",
+      "default": "./dist/ed25519.js"
+    },
+    "./padding": {
+      "types": "./src/padding.ts",
+      "default": "./dist/padding.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "age-encryption": "^0.3.1"
+  }
+}

@@ -10,14 +10,14 @@ echo "=== derive-keys-from-seed ==="
 cargo run -p msgpunk-crypto --example derive-keys-from-seed -- "$FLOW/01-keys"
 
 echo "=== encrypt-form-structure-with-aes-gcm-and-age-encrypt-password ==="
-node packages/test-vectors/scripts/encrypt-form-structure-with-aes-gcm.js "$FLOW/01-keys" "$FLOW/02-form-setup"
+pnpm tsx packages/test-vectors/scripts/encrypt-form-structure-with-aes-gcm.ts "$FLOW/01-keys" "$FLOW/02-form-setup"
 
 echo "=== decrypt-form-structure-with-age-then-aes-gcm ==="
-cargo run -p msgpunk-crypto --example decrypt-form-structure -- "$FLOW/01-keys" "$FLOW/02-form-setup" "$FLOW/03-form-read"
+pnpm tsx packages/test-vectors/scripts/decrypt-form-structure-with-age-then-aes-gcm.ts "$FLOW/01-keys" "$FLOW/02-form-setup" "$FLOW/03-form-read"
 grep -qx 'PASS' "$FLOW/03-form-read/result"
 
 echo "=== encrypt-submission-payload-with-age ==="
-node packages/test-vectors/scripts/encrypt-submission-payload-with-age.js "$FLOW/01-keys" "$FLOW/04-submission"
+pnpm tsx packages/test-vectors/scripts/encrypt-submission-payload-with-age.ts "$FLOW/01-keys" "$FLOW/04-submission"
 
 echo "=== decrypt-submission-payload-with-age ==="
 cargo run -p msgpunk-crypto --example decrypt-submission-payload -- "$FLOW/01-keys" "$FLOW/04-submission" "$FLOW/05-submission-read"
@@ -28,7 +28,7 @@ cargo run -p msgpunk-crypto --example sign-auth-challenge-ed25519 -- "$FLOW/01-k
 grep -qx 'PASS' "$FLOW/06-auth-rust/result"
 
 echo "=== verify-auth-signature-ed25519 ==="
-node packages/test-vectors/scripts/verify-auth-signature-ed25519.js "$FLOW/06-auth-rust" "$FLOW/06-auth-ts"
+pnpm tsx packages/test-vectors/scripts/verify-auth-signature-ed25519.ts "$FLOW/06-auth-rust" "$FLOW/06-auth-ts"
 grep -qx 'PASS' "$FLOW/06-auth-ts/result"
 
 echo "=== done ==="

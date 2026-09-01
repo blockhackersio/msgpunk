@@ -8,11 +8,13 @@
   packages = with pkgs; [
     cargo
     rustc
+    rust-analyzer
     openssl
     git
     pkg-config
     nodejs_22
     pnpm
+    nodePackages.typescript-language-server
     jq
     curl
     lld

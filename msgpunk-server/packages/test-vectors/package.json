@@ -2,8 +2,13 @@
   "name": "test-vectors",
   "private": true,
   "type": "module",
-  "scripts": {},
+  "scripts": {
+    "encrypt:structure": "tsx scripts/encrypt-form-structure-with-aes-gcm.ts",
+    "decrypt:structure": "tsx scripts/decrypt-form-structure-with-age-then-aes-gcm.ts",
+    "verify:signature": "tsx scripts/verify-auth-signature-ed25519.ts"
+  },
   "dependencies": {
+    "@msgpunk/toolkit": "workspace:*",
     "age-encryption": "^0.3.1"
   }
 }

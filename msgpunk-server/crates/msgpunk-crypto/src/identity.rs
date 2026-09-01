@@ -5,43 +5,9 @@ use sha2::Sha512;
 
 type HmacSha512 = Hmac<Sha512>;
 
-pub struct DerivedKeys {
-    pub age_identity: age::x25519::Identity,
-    pub age_recipient: age::x25519::Recipient,
-    pub signing_key: SigningKey,
-    pub verifying_key: ed25519_dalek::VerifyingKey,
-    pub seed: [u8; 64],
-}
-
-pub fn derive_keys(phrase: &str, index: u32) -> DerivedKeys {
+pub fn seed_from_phrase(phrase: &str) -> [u8; 64] {
     let mnemonic = Mnemonic::parse(phrase).expect("valid BIP-39 phrase");
-    let seed = mnemonic.to_seed("");
-
-    let secret = derive_slip10_ed25519(&seed, index);
-
-    let signing_key = SigningKey::from_bytes(&secret);
-    let verifying_key = signing_key.verifying_key();
-
-    let age_identity = age_identity_from_secret(&secret);
-    let age_recipient = age_identity.to_public();
-
-    DerivedKeys {
-        age_identity,
-        age_recipient,
-        signing_key,
-        verifying_key,
-        seed,
-    }
-}
-
-pub fn age_identity_from_secret(secret: &[u8; 32]) -> age::x25519::Identity {
-    let encoded = encode_age_secret_key(secret);
-    encoded.parse().expect("valid age secret key")
-}
-
-pub fn encode_age_secret_key(secret: &[u8; 32]) -> String {
-    let hrp = bech32::Hrp::parse("age-secret-key-").expect("valid hrp");
-    bech32::encode::<bech32::Bech32>(hrp, secret).expect("bech32 encode")
+    mnemonic.to_seed("")
 }
 
 pub fn derive_slip10_ed25519(seed: &[u8; 64], index: u32) -> [u8; 32] {
@@ -68,6 +34,20 @@ pub fn derive_slip10_ed25519(seed: &[u8; 64], index: u32) -> [u8; 32] {
     }
 
     key
+}
+
+pub fn ed25519_signing_key_from_secret(secret: &[u8; 32]) -> SigningKey {
+    SigningKey::from_bytes(secret)
+}
+
+pub fn age_identity_from_secret(secret: &[u8; 32]) -> age::x25519::Identity {
+    let encoded = encode_age_secret_key(secret);
+    encoded.parse().expect("valid age secret key")
+}
+
+pub fn encode_age_secret_key(secret: &[u8; 32]) -> String {
+    let hrp = bech32::Hrp::parse("age-secret-key-").expect("valid hrp");
+    bech32::encode::<bech32::Bech32>(hrp, secret).expect("bech32 encode")
 }
 
 fn slip10_path(index: u32) -> Vec<u32> {

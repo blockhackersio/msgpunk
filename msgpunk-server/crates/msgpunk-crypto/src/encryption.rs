@@ -23,14 +23,6 @@ use aes_gcm::{
     Aes256Gcm, Nonce,
 };
 
-pub fn aes_gcm_decrypt(key: &[u8; 32], ciphertext: &[u8], nonce: &[u8; 12]) -> Vec<u8> {
-    let cipher = Aes256Gcm::new_from_slice(key).expect("valid key");
-    let nonce = Nonce::from_slice(nonce);
-    cipher
-        .decrypt(nonce, ciphertext)
-        .expect("aes-gcm decrypt")
-}
-
 pub fn aes_gcm_encrypt(key: &[u8; 32], plaintext: &[u8]) -> (Vec<u8>, [u8; 12]) {
     let cipher = Aes256Gcm::new_from_slice(key).expect("valid key");
     let nonce_bytes: [u8; 12] = rand::random();
