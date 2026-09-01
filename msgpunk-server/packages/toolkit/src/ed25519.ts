@@ -18,3 +18,13 @@ export function timestampFresh(tsSecs: number, maxAge = 30): boolean {
   const now = Math.floor(Date.now() / 1000);
   return Math.abs(now - tsSecs) <= maxAge;
 }
+
+export function verifyAuthChallenge(
+  pubkeyHex: string,
+  formId: string,
+  timestamp: string,
+  signature: string,
+): boolean {
+  const message = `${formId}:${timestamp}`;
+  return verify(pubkeyHex, message, signature) && timestampFresh(parseInt(timestamp));
+}

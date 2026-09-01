@@ -1512,6 +1512,7 @@ version = "0.1.0"
 dependencies = [
  "aes-gcm",
  "age",
+ "base64",
  "bech32",
  "bip39",
  "ed25519-dalek",

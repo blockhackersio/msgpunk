@@ -17,3 +17,7 @@ export function timestampFresh(tsSecs, maxAge = 30) {
     const now = Math.floor(Date.now() / 1000);
     return Math.abs(now - tsSecs) <= maxAge;
 }
+export function verifyAuthChallenge(pubkeyHex, formId, timestamp, signature) {
+    const message = `${formId}:${timestamp}`;
+    return verify(pubkeyHex, message, signature) && timestampFresh(parseInt(timestamp));
+}

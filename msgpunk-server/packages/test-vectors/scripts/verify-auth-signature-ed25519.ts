@@ -1,4 +1,4 @@
-import { ed25519Verify, timestampFresh } from '@msgpunk/toolkit';
+import { verifyAuthChallenge } from '@msgpunk/toolkit';
 import fs from 'node:fs';
 
 const [inDir, outDir] = process.argv.slice(2);
@@ -8,7 +8,5 @@ const timestamp = fs.readFileSync(`${inDir}/timestamp.txt`, 'utf-8').trim();
 const signature = fs.readFileSync(`${inDir}/signature.txt`, 'utf-8').trim();
 const pubkeyHex = fs.readFileSync(`${inDir}/pubkey.txt`, 'utf-8').trim();
 
-const message = `${formId}:${timestamp}`;
-
-const valid = ed25519Verify(pubkeyHex, message, signature) && timestampFresh(parseInt(timestamp));
+const valid = verifyAuthChallenge(pubkeyHex, formId, timestamp, signature);
 fs.writeFileSync(`${outDir}/result`, valid ? 'PASS' : 'FAIL');

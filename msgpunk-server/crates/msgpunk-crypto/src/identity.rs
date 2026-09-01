@@ -5,6 +5,26 @@ use sha2::Sha512;
 
 type HmacSha512 = Hmac<Sha512>;
 
+pub struct DerivedKeys {
+    pub secret: [u8; 32],
+    pub age_identity: age::x25519::Identity,
+    pub age_recipient: age::x25519::Recipient,
+    pub ed25519_pubkey: [u8; 32],
+}
+
+pub fn derive_all(seed: &[u8; 64], index: u32) -> DerivedKeys {
+    let secret = derive_slip10_ed25519(seed, index);
+    let signing_key = ed25519_signing_key_from_secret(&secret);
+    let age_identity = age_identity_from_secret(&secret);
+    let age_recipient = age_identity.to_public();
+    DerivedKeys {
+        secret,
+        age_identity,
+        age_recipient,
+        ed25519_pubkey: signing_key.verifying_key().to_bytes(),
+    }
+}
+
 pub fn seed_from_phrase(phrase: &str) -> [u8; 64] {
     let mnemonic = Mnemonic::parse(phrase).expect("valid BIP-39 phrase");
     mnemonic.to_seed("")
