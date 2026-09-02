@@ -1,2 +1,7 @@
-.devenv
-.direnv
+.devenv/
+.direnv/
+target/
+node_modules/
+packages/*/node_modules/
+.test-output/
+.pnpm-store/
