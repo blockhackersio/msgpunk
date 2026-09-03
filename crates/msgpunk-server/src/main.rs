@@ -115,6 +115,11 @@ async fn verify_auth(
     Ok(())
 }
 
+#[get("/health")]
+async fn healthcheck() -> HttpResponse {
+    HttpResponse::Ok().json(serde_json::json!({ "status": "ok" }))
+}
+
 #[post("/f/{form_id}")]
 async fn create_form(
     state: Data<AppState>,
@@ -264,7 +269,8 @@ async fn delete_message(
 }
 
 fn configure(cfg: &mut web::ServiceConfig) {
-    cfg.service(create_form)
+    cfg.service(healthcheck)
+        .service(create_form)
         .service(submit_message)
         .service(list_messages)
         .service(get_message)
@@ -304,6 +310,22 @@ mod tests {
         let dir = std::env::temp_dir().join(format!("msgpunk-test-{}", ulid::Ulid::new()));
         std::fs::create_dir_all(&dir).ok();
         Arc::new(FilesystemStorage::new(dir))
+    }
+
+    #[actix_web::test]
+    async fn test_healthcheck() {
+        let storage = test_storage();
+        let state = Data::new(AppState { storage });
+        let mut app = test::init_service(
+            actix_web::App::new()
+                .app_data(state)
+                .configure(configure),
+        )
+        .await;
+
+        let req = test::TestRequest::get().uri("/health").to_request();
+        let resp = test::call_service(&mut app, req).await;
+        assert_eq!(resp.status(), 200);
     }
 
     #[actix_web::test]

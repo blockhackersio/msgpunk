@@ -1,8 +1,10 @@
 To get the first incarnation of this we need to look at steps separately
 
-Step 1: NOW! Server (everything should be tested)
-- accept published forms 
-- return list of responses
+
+Step 1: Connect client and Server
+- Add a healthcheck route to the server
+- create a script that runs the server locally and sends it through cfup.sh to get a url and sets this url on the client while running the client through devenv shell with the env var passed in that is the cloudflare url for the server
+- Get the client to make a request from the server through it's env var. This can be a button that requests the tauri function which makes an http request to the server healthcheck based on the injected env var. 
 
 Step 2: NEXT Android Interface
 - Fixed form structure (NO form builder).
