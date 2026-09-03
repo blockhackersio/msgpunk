@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { invoke } from '@tauri-apps/api/core'
 import {
   IonApp,
   IonPage,
@@ -15,6 +16,21 @@ import {
 
 function App() {
   const [count, setCount] = useState(0)
+  const [healthResult, setHealthResult] = useState<string | null>(null)
+
+  async function handleHealthcheck() {
+    try {
+      const serverUrl = import.meta.env.VITE_MSGPUNK_SERVER_URL
+      if (!serverUrl) {
+        setHealthResult('Error: VITE_MSGPUNK_SERVER_URL not set')
+        return
+      }
+      const result = await invoke<string>('check_health', { serverUrl })
+      setHealthResult(result)
+    } catch (e) {
+      setHealthResult(`Error: ${e}`)
+    }
+  }
 
   return (
     <IonApp>
@@ -69,6 +85,24 @@ function App() {
             >
               Reset
             </IonButton>
+
+            <IonCard style={{ width: '100%', maxWidth: '400px' }}>
+              <IonCardHeader>
+                <IonCardTitle style={{ textAlign: 'center' }}>
+                  Server Health
+                </IonCardTitle>
+              </IonCardHeader>
+              <IonCardContent style={{ textAlign: 'center' }}>
+                <IonButton onClick={handleHealthcheck}>
+                  Check Health
+                </IonButton>
+                {healthResult && (
+                  <p style={{ marginTop: '12px', fontSize: '14px' }}>
+                    {healthResult}
+                  </p>
+                )}
+              </IonCardContent>
+            </IonCard>
           </div>
         </IonContent>
       </IonPage>

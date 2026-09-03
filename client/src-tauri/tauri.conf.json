@@ -6,7 +6,7 @@
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:5173",
-    "beforeDevCommand": "pnpm dev",
+    "beforeDevCommand": "NODE_OPTIONS=\"--max-old-space-size=4096\" pnpm dev",
     "beforeBuildCommand": "pnpm build"
   },
   "app": {
