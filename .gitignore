@@ -5,3 +5,4 @@ node_modules/
 packages/*/node_modules/
 .test-output/
 .pnpm-store/
+.msgpunk/
