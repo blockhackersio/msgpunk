@@ -36,7 +36,7 @@ pub fn aes_gcm_encrypt(key: &[u8; 32], plaintext: &[u8]) -> (Vec<u8>, [u8; 12]) 
 }
 
 fn generate_password() -> String {
-    let bytes: [u8; 16] = rand::random();
+    let bytes: [u8; 4] = rand::random();
     hex::encode(bytes)
 }
 

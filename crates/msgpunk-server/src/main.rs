@@ -10,8 +10,13 @@ use chrono::Utc;
 use msgpunk_crypto::auth::{timestamp_fresh, verify};
 use msgpunk_crypto::identity::verify_ed25519_matches_age_recipient;
 use msgpunk_storage::{BlobMeta, FormData, Storage};
+use rust_embed::RustEmbed;
 use serde::Deserialize;
 use serde::Serialize;
+
+#[derive(RustEmbed)]
+#[folder = "static"]
+struct StaticFiles;
 
 pub struct AppState {
     pub storage: Arc<dyn Storage>,
@@ -292,6 +297,25 @@ async fn delete_message(
     }
 }
 
+#[get("/f/{path:.*}")]
+async fn serve_static(path: web::Path<String>) -> HttpResponse {
+    let path = path.into_inner();
+    let path = if path.is_empty() || !StaticFiles::get(&path).is_some() {
+        "index.html"
+    } else {
+        &path
+    };
+    match StaticFiles::get(path) {
+        Some(content) => {
+            let mime = mime_guess::from_path(path).first_or_octet_stream();
+            HttpResponse::Ok()
+                .content_type(mime.as_ref())
+                .body(content.data.into_owned())
+        }
+        None => HttpResponse::NotFound().finish(),
+    }
+}
+
 fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(healthcheck)
         .service(create_form)
@@ -300,7 +324,7 @@ fn configure(cfg: &mut web::ServiceConfig) {
         .service(list_messages)
         .service(get_message)
         .service(delete_message)
-        .service(actix_files::Files::new("/f", "static").index_file("index.html"));
+        .service(serve_static);
 }
 
 #[actix_web::main]

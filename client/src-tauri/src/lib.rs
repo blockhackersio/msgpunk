@@ -201,7 +201,7 @@ async fn create_form(
 
     let form_structure = r#"{"title":"Contact Me","fields":[{"id":"signal","type":"text","label":"Signal Account","required":true},{"id":"name","type":"text","label":"What should I call you?","required":true},{"id":"message","type":"textarea","label":"Your Message","required":true}]}"#;
 
-    let (encrypted_b64, encrypted_password, _password) =
+    let (encrypted_b64, encrypted_password, password) =
         msgpunk_crypto::encryption::encrypt_form_structure(form_structure, &recipient_str);
 
     let body = serde_json::json!({
@@ -211,15 +211,22 @@ async fn create_form(
         "encrypted_password": encrypted_password,
     });
 
-    let url = format!(
+    let form_url = format!(
         "{}/f/{}",
         server_url.trim_end_matches('/'),
         form_id
     );
 
+    let full_url = format!(
+        "{}/f/{}#{}",
+        server_url.trim_end_matches('/'),
+        form_id,
+        password.trim(),
+    );
+
     let client = reqwest::Client::new();
     let resp = client
-        .post(&url)
+        .post(&form_url)
         .json(&body)
         .send()
         .await
@@ -242,7 +249,7 @@ async fn create_form(
         set_key_index(&db, key_index + 1)?;
     }
 
-    Ok(form_id)
+    Ok(full_url)
 }
 
 #[tauri::command]

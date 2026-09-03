@@ -3,7 +3,7 @@ import { sha256 } from '@noble/hashes/sha256';
 import { randomBytes } from '@noble/hashes/utils';
 
 export function generatePassword(): string {
-  const bytes = randomBytes(16);
+  const bytes = randomBytes(4);
   return Array.from(bytes)
     .map((b) => b.toString(16).padStart(2, '0'))
     .join('');

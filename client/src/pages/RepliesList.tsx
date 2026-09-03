@@ -34,6 +34,7 @@ export default function RepliesList() {
   const [loading, setLoading] = useState(true)
   const [deleteTarget, setDeleteTarget] = useState<ReplyInfo | null>(null)
   const [toastMsg, setToastMsg] = useState('')
+  const [formUrl, setFormUrl] = useState('')
 
   const serverUrl = import.meta.env.VITE_MSGPUNK_SERVER_URL
 
@@ -56,6 +57,13 @@ export default function RepliesList() {
     loadReplies()
   }, [loadReplies])
 
+  useEffect(() => {
+    if (!serverUrl || !formId) return
+    invoke<string>('get_form_url', { formId, serverUrl })
+      .then(setFormUrl)
+      .catch(() => {})
+  }, [formId, serverUrl])
+
   async function handleDelete() {
     if (!deleteTarget || !serverUrl) return
     try {
@@ -77,7 +85,7 @@ export default function RepliesList() {
     try {
       const url = await invoke<string>('get_form_url', { formId, serverUrl })
       await navigator.clipboard.writeText(url)
-      setToastMsg('Form URL copied to clipboard')
+      setToastMsg(url)
     } catch (e) {
       setToastMsg(`Failed: ${e}`)
     }
@@ -102,6 +110,20 @@ export default function RepliesList() {
       </IonHeader>
       <IonContent className="ion-padding">
         <IonLoading isOpen={loading} message="Loading replies..." />
+
+        {formUrl && (
+          <div style={{
+            background: 'var(--ion-color-light)',
+            borderRadius: '8px',
+            padding: '8px 12px',
+            marginBottom: '12px',
+            fontSize: '0.8em',
+            wordBreak: 'break-all',
+            fontFamily: 'monospace',
+          }}>
+            {formUrl}
+          </div>
+        )}
 
         <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
           <IonRefresherContent />
@@ -153,7 +175,8 @@ export default function RepliesList() {
         <IonToast
           isOpen={!!toastMsg}
           message={toastMsg}
-          duration={3000}
+          duration={6000}
+          buttons={[{ text: 'Dismiss', role: 'cancel' }]}
           onDidDismiss={() => setToastMsg('')}
         />
       </IonContent>

@@ -67,11 +67,11 @@ export default function FormsList() {
       return
     }
     try {
-      await invoke('create_form', { displayName: newName.trim(), serverUrl })
+      const url = await invoke<string>('create_form', { displayName: newName.trim(), serverUrl })
       setShowAddModal(false)
       setNewName('')
       await loadForms()
-      setToastMsg('Form published!')
+      setToastMsg(url)
     } catch (e) {
       setToastMsg(`Failed: ${e}`)
     }
@@ -241,7 +241,8 @@ export default function FormsList() {
         <IonToast
           isOpen={!!toastMsg}
           message={toastMsg}
-          duration={3000}
+          duration={6000}
+          buttons={[{ text: 'Dismiss', role: 'cancel' }]}
           onDidDismiss={() => setToastMsg('')}
         />
       </IonContent>

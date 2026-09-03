@@ -13,6 +13,9 @@ cleanup() {
 }
 trap cleanup EXIT SIGINT SIGTERM
 
+echo "Building static frontend..."
+(cd "$ROOT_DIR" && pnpm build)
+
 echo "Starting msgpunk-server..."
 $DEVENV_CMD cargo run -p msgpunk-server &
 SERVER_PID=$!
