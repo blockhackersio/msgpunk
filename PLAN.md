@@ -1,4 +1,4 @@
-To get the first incarnation of this we need to look at steps separatey
+To get the first incarnation of this we need to look at steps separately
 
 Step 1: NOW! Server (everything should be tested)
 - accept published forms 

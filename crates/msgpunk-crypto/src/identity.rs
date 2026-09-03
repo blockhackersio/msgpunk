@@ -14,8 +14,12 @@ pub struct DerivedKeys {
 
 pub fn derive_all(seed: &[u8; 64], index: u32) -> DerivedKeys {
     let secret = derive_slip10_ed25519(seed, index);
+
     let signing_key = ed25519_signing_key_from_secret(&secret);
-    let age_identity = age_identity_from_secret(&secret);
+
+    let scalar = expand_ed25519_scalar(&secret);
+
+    let age_identity = age_identity_from_secret(&scalar);
     let age_recipient = age_identity.to_public();
     DerivedKeys {
         secret,
@@ -23,6 +27,20 @@ pub fn derive_all(seed: &[u8; 64], index: u32) -> DerivedKeys {
         age_recipient,
         ed25519_pubkey: signing_key.verifying_key().to_bytes(),
     }
+}
+
+/// Expands an Ed25519 seed via SHA-512 and extracts the clamped scalar.
+/// This matches what ed25519-dalek does internally in `SigningKey::from_bytes`.
+/// The same scalar is used by X25519 (clamping is identical between the two).
+fn expand_ed25519_scalar(seed: &[u8; 32]) -> [u8; 32] {
+    use sha2::Digest;
+    let hash = Sha512::digest(seed);
+    let mut scalar = [0u8; 32];
+    scalar.copy_from_slice(&hash[..32]);
+    scalar[0] &= 248;
+    scalar[31] &= 63;
+    scalar[31] |= 64;
+    scalar
 }
 
 pub fn seed_from_phrase(phrase: &str) -> [u8; 64] {
@@ -85,4 +103,35 @@ fn split_hmac_result(result: &[u8; 64]) -> ([u8; 32], [u8; 32]) {
     key.copy_from_slice(&result[..32]);
     chain.copy_from_slice(&result[32..]);
     (key, chain)
+}
+
+pub fn verify_ed25519_matches_age_recipient(
+    ed25519_pubkey_hex: &str,
+    age_recipient_str: &str,
+) -> Result<(), String> {
+    use curve25519_dalek::edwards::CompressedEdwardsY;
+
+    let pubkey_bytes =
+        hex::decode(ed25519_pubkey_hex).map_err(|_| "invalid ed25519 pubkey hex".to_string())?;
+    let pubkey_bytes: [u8; 32] = pubkey_bytes
+        .try_into()
+        .map_err(|_| "ed25519 pubkey must be 32 bytes".to_string())?;
+
+    let compressed = CompressedEdwardsY(pubkey_bytes);
+    let edwards_point = compressed
+        .decompress()
+        .ok_or("failed to decompress edwards point".to_string())?;
+
+    let montgomery_point = edwards_point.to_montgomery();
+    let expected_x: [u8; 32] = montgomery_point.to_bytes();
+
+    let hrp = bech32::Hrp::parse("age").expect("valid hrp");
+    let expected_recipient =
+        bech32::encode::<bech32::Bech32>(hrp, &expected_x).expect("bech32 encode");
+
+    if expected_recipient == age_recipient_str {
+        Ok(())
+    } else {
+        Err("ed25519 pubkey does not match age recipient".to_string())
+    }
 }
