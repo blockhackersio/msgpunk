@@ -24,6 +24,10 @@
     "./padding": {
       "types": "./src/padding.ts",
       "default": "./dist/padding.js"
+    },
+    "./form": {
+      "types": "./src/form.ts",
+      "default": "./dist/form.js"
     }
   },
   "scripts": {

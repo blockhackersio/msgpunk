@@ -216,11 +216,16 @@ The password lives in the URL hash fragment — never sent to the server.
 
 ```json
 {
-  "title": "Contact Me",
-  "fields": [
-    {"id": "name", "type": "text", "label": "Your Name", "required": true},
-    {"id": "msg", "type": "textarea", "label": "Message", "required": true}
-  ]
+  "blocks": [
+    {"id": "name", "name": "short-text", "attributes": {"label": "Your Name", "required": true}},
+    {"id": "msg", "name": "long-text", "attributes": {"label": "Message", "required": true}}
+  ],
+  "settings": {
+    "disableProgressBar": false,
+    "disableWheelSwiping": false,
+    "disableNavigationArrows": false,
+    "animationDirection": "vertical"
+  }
 }
 ```
 

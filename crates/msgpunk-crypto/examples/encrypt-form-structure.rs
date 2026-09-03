@@ -18,7 +18,7 @@ fn main() {
         .trim()
         .to_string();
 
-    let structure = r#"{"title":"Contact Me","fields":[{"id":"name","type":"text","label":"Your Name","required":true},{"id":"msg","type":"textarea","label":"Message","required":true}]}"#;
+    let structure = r#"{"blocks":[{"id":"name","name":"short-text","attributes":{"label":"Your Name","required":true,"placeholder":false}},{"id":"msg","name":"long-text","attributes":{"label":"Message","required":true,"placeholder":false}}],"settings":{"disableProgressBar":false,"disableWheelSwiping":false,"disableNavigationArrows":false,"animationDirection":"vertical"}}"#;
 
     let (encrypted_b64, encrypted_password, password) =
         msgpunk_crypto::encryption::encrypt_form_structure(structure, &recipient);

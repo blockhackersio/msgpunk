@@ -199,7 +199,7 @@ async fn create_form(
     let recipient_str = keys.age_recipient.to_string();
     let form_id = compute_form_id(&recipient_str, key_index);
 
-    let form_structure = r#"{"title":"Contact Me","fields":[{"id":"signal","type":"text","label":"Signal Account","required":true},{"id":"name","type":"text","label":"What should I call you?","required":true},{"id":"message","type":"textarea","label":"Your Message","required":true}]}"#;
+    let form_structure = r#"{"blocks":[{"id":"signal","name":"short-text","attributes":{"label":"Signal Account","required":true,"placeholder":false}},{"id":"name","name":"short-text","attributes":{"label":"What should I call you?","required":true,"placeholder":false}},{"id":"message","name":"long-text","attributes":{"label":"Your Message","required":true,"placeholder":false}}],"settings":{"disableProgressBar":false,"disableWheelSwiping":false,"disableNavigationArrows":false,"animationDirection":"vertical"}}"#;
 
     let (encrypted_b64, encrypted_password, password) =
         msgpunk_crypto::encryption::encrypt_form_structure(form_structure, &recipient_str);

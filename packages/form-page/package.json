@@ -9,10 +9,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "react": "^19",
-    "react-dom": "^19",
     "@msgpunk/toolkit": "workspace:*",
-    "age-encryption": "^0.3.1"
+    "age-encryption": "^0.3.1",
+    "react": "^19",
+    "react-dom": "^19"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4",
