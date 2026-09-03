@@ -518,6 +518,64 @@ async fn check_health(server_url: String) -> Result<String, String> {
     Ok(format!("{} - {}", status, body))
 }
 
+#[tauri::command]
+async fn get_form_url(
+    state: State<'_, Db>,
+    form_id: String,
+    server_url: String,
+) -> Result<String, String> {
+    let (seed, key_index) = {
+        let db = state.0.lock().map_err(|e| e.to_string())?;
+        let seed_phrase = get_seed(&db)?;
+        let seed = msgpunk_crypto::identity::seed_from_phrase(&seed_phrase);
+        let key_index: u32 = db
+            .query_row(
+                "SELECT key_index FROM forms WHERE form_id = ?1",
+                [&form_id],
+                |row| row.get(0),
+            )
+            .map_err(|e| format!("form not found: {}", e))?;
+        (seed, key_index)
+    };
+
+    let keys = derive_keys_for_form(&seed, key_index);
+
+    let base = server_url.trim_end_matches('/');
+    let data_url = format!("{}/f/{}/data", base, form_id);
+
+    let client = reqwest::Client::new();
+    let resp = client
+        .get(&data_url)
+        .send()
+        .await
+        .map_err(|e| format!("fetch failed: {}", e))?;
+
+    if !resp.status().is_success() {
+        return Err(format!("server returned {}", resp.status()));
+    }
+
+    #[derive(serde::Deserialize)]
+    struct FormDataResponse {
+        encrypted_structure: String,
+        age_recipient: String,
+        encrypted_password: String,
+    }
+
+    let data: FormDataResponse = resp
+        .json()
+        .await
+        .map_err(|e| format!("parse failed: {}", e))?;
+
+    let decrypted_password =
+        age::decrypt(&keys.age_identity, data.encrypted_password.as_bytes())
+            .map_err(|e| format!("age decrypt failed: {}", e))?;
+    let password =
+        String::from_utf8(decrypted_password).map_err(|e| format!("utf8: {}", e))?;
+
+    let url = format!("{}/f/{}#{}", base, form_id, password.trim());
+    Ok(url)
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -550,6 +608,7 @@ pub fn run() {
             get_reply,
             delete_reply,
             check_health,
+            get_form_url,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

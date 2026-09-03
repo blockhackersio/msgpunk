@@ -19,7 +19,7 @@ import {
   IonRefresherContent,
   IonLoading,
 } from '@ionic/react'
-import { trashOutline, arrowBack } from 'ionicons/icons'
+import { trashOutline, arrowBack, copyOutline } from 'ionicons/icons'
 
 interface ReplyInfo {
   msg_id: string
@@ -72,6 +72,17 @@ export default function RepliesList() {
     loadReplies().then(() => (e as any).detail.complete())
   }
 
+  async function handleCopyUrl() {
+    if (!serverUrl || !formId) return
+    try {
+      const url = await invoke<string>('get_form_url', { formId, serverUrl })
+      await navigator.clipboard.writeText(url)
+      setToastMsg('Form URL copied to clipboard')
+    } catch (e) {
+      setToastMsg(`Failed: ${e}`)
+    }
+  }
+
   return (
     <IonPage>
       <IonHeader>
@@ -82,6 +93,11 @@ export default function RepliesList() {
             </IonButton>
           </IonButtons>
           <IonTitle>Replies</IonTitle>
+          <IonButtons slot="end">
+            <IonButton onClick={handleCopyUrl}>
+              <IonIcon icon={copyOutline} />
+            </IonButton>
+          </IonButtons>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">

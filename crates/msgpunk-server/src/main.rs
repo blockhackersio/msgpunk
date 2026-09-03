@@ -30,6 +30,13 @@ pub struct CreateFormResponse {
     pub form_id: String,
 }
 
+#[derive(Serialize)]
+pub struct GetFormDataResponse {
+    pub encrypted_structure: String,
+    pub age_recipient: String,
+    pub encrypted_password: String,
+}
+
 #[derive(Deserialize)]
 pub struct AuthQuery {
     pub since: Option<String>,
@@ -142,6 +149,23 @@ async fn create_form(
 
     match state.storage.store_form(&form_id, &data).await {
         Ok(()) => HttpResponse::Created().json(CreateFormResponse { form_id }),
+        Err(e) => {
+            error_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR, &e.to_string())
+        }
+    }
+}
+
+#[get("/f/{form_id}/data")]
+async fn get_form_data(state: Data<AppState>, path: Path<String>) -> HttpResponse {
+    let form_id = path.into_inner();
+
+    match state.storage.get_form(&form_id).await {
+        Ok(Some(form)) => HttpResponse::Ok().json(GetFormDataResponse {
+            encrypted_structure: form.encrypted_structure,
+            age_recipient: form.age_recipient,
+            encrypted_password: form.encrypted_password,
+        }),
+        Ok(None) => error_response(actix_web::http::StatusCode::NOT_FOUND, "form_not_found"),
         Err(e) => {
             error_response(actix_web::http::StatusCode::INTERNAL_SERVER_ERROR, &e.to_string())
         }
@@ -271,10 +295,12 @@ async fn delete_message(
 fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(healthcheck)
         .service(create_form)
+        .service(get_form_data)
         .service(submit_message)
         .service(list_messages)
         .service(get_message)
-        .service(delete_message);
+        .service(delete_message)
+        .service(actix_files::Files::new("/f", "static").index_file("index.html"));
 }
 
 #[actix_web::main]

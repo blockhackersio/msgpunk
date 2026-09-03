@@ -1,26 +1,32 @@
-import crypto from 'node:crypto';
+import { gcm } from '@noble/ciphers/aes';
+import { sha256 } from '@noble/hashes/sha256';
+import { randomBytes } from '@noble/hashes/utils';
 
 export function generatePassword(): string {
-  return crypto.randomBytes(16).toString('hex');
+  const bytes = randomBytes(16);
+  return Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
 }
 
-export function encrypt(key: Buffer, plaintext: string): Buffer {
-  const nonce = crypto.randomBytes(12);
-  const cipher = crypto.createCipheriv('aes-256-gcm', key, nonce);
-  let encrypted = cipher.update(plaintext, 'utf-8');
-  encrypted = Buffer.concat([encrypted, cipher.final()]);
-  return Buffer.concat([nonce, encrypted, cipher.getAuthTag()]);
+export function deriveKey(password: string): Uint8Array {
+  return sha256(new TextEncoder().encode(password));
 }
 
-export function decrypt(key: Buffer, ciphertext: Buffer): string {
-  const nonce = ciphertext.subarray(0, 12);
-  const tag = ciphertext.subarray(-16);
-  const data = ciphertext.subarray(12, -16);
-  const decipher = crypto.createDecipheriv('aes-256-gcm', key, nonce);
-  decipher.setAuthTag(tag);
-  return decipher.update(data) + decipher.final('utf-8');
+export function encrypt(key: Uint8Array, plaintext: string): Uint8Array {
+  const nonce = randomBytes(12);
+  const cipher = gcm(key, nonce);
+  const encrypted = cipher.encrypt(new TextEncoder().encode(plaintext));
+  const result = new Uint8Array(12 + encrypted.length);
+  result.set(nonce, 0);
+  result.set(encrypted, 12);
+  return result;
 }
 
-export function deriveKey(password: string): Buffer {
-  return crypto.createHash('sha256').update(password).digest();
+export function decrypt(key: Uint8Array, ciphertext: Uint8Array): string {
+  const nonce = ciphertext.slice(0, 12);
+  const data = ciphertext.slice(12);
+  const cipher = gcm(key, nonce);
+  const decrypted = cipher.decrypt(data);
+  return new TextDecoder().decode(decrypted);
 }
