@@ -19,8 +19,9 @@ import {
   IonRefresher,
   IonRefresherContent,
   IonLoading,
+  IonActionSheet,
 } from '@ionic/react'
-import { trashOutline, arrowBack, copyOutline } from 'ionicons/icons'
+import { trashOutline, arrowBack, shareOutline } from 'ionicons/icons'
 
 interface ReplyInfo {
   msg_id: string
@@ -35,7 +36,8 @@ export default function RepliesList() {
   const [loading, setLoading] = useState(true)
   const [deleteTarget, setDeleteTarget] = useState<ReplyInfo | null>(null)
   const [toastMsg, setToastMsg] = useState('')
-  const [formUrl, setFormUrl] = useState('')
+  const [showActions, setShowActions] = useState(false)
+  const [password, setPassword] = useState('')
 
   const serverUrl = SERVER_URL
 
@@ -61,7 +63,10 @@ export default function RepliesList() {
   useEffect(() => {
     if (!serverUrl || !formId) return
     invoke<string>('get_form_url', { formId, serverUrl })
-      .then(setFormUrl)
+      .then((url) => {
+        const hashIdx = url.indexOf('#')
+        if (hashIdx !== -1) setPassword(url.slice(hashIdx + 1))
+      })
       .catch(() => { })
   }, [formId, serverUrl])
 
@@ -81,12 +86,30 @@ export default function RepliesList() {
     loadReplies().then(() => (e as any).detail.complete())
   }
 
+  function handleShare() {
+    setShowActions(true)
+  }
+
   async function handleCopyUrl() {
+    setShowActions(false)
     if (!serverUrl || !formId) return
     try {
       const url = await invoke<string>('get_form_url', { formId, serverUrl })
       await navigator.clipboard.writeText(url)
       setToastMsg(url)
+    } catch (e) {
+      setToastMsg(`Failed: ${e}`)
+    }
+  }
+
+  async function handleCopyEmbed() {
+    setShowActions(false)
+    if (!serverUrl || !formId || !password) return
+    const base = serverUrl.replace(/\/+$/, '')
+    const snippet = `<script src="${base}/embed.js"></script>\n<button class="msgpunk-form" data-form="${formId}" data-password="${password}">Send me a message</button>`
+    try {
+      await navigator.clipboard.writeText(snippet)
+      setToastMsg(snippet)
     } catch (e) {
       setToastMsg(`Failed: ${e}`)
     }
@@ -103,28 +126,14 @@ export default function RepliesList() {
           </IonButtons>
           <IonTitle>Replies</IonTitle>
           <IonButtons slot="end">
-            <IonButton onClick={handleCopyUrl}>
-              <IonIcon icon={copyOutline} />
+            <IonButton onClick={handleShare}>
+              <IonIcon icon={shareOutline} />
             </IonButton>
           </IonButtons>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
         <IonLoading isOpen={loading} message="Loading replies..." />
-
-        {formUrl && (
-          <div style={{
-            background: 'var(--ion-color-light)',
-            borderRadius: '8px',
-            padding: '8px 12px',
-            marginBottom: '12px',
-            fontSize: '0.8em',
-            wordBreak: 'break-all',
-            fontFamily: 'monospace',
-          }}>
-            {formUrl}
-          </div>
-        )}
 
         <IonRefresher slot="fixed" onIonRefresh={handleRefresh}>
           <IonRefresherContent />
@@ -170,6 +179,17 @@ export default function RepliesList() {
           buttons={[
             { text: 'Cancel', role: 'cancel' },
             { text: 'Delete', role: 'destructive', handler: handleDelete },
+          ]}
+        />
+
+        <IonActionSheet
+          isOpen={showActions}
+          onDidDismiss={() => setShowActions(false)}
+          header="Share Form"
+          buttons={[
+            { text: 'Copy Form URL', handler: handleCopyUrl },
+            { text: 'Copy Embed Code', handler: handleCopyEmbed },
+            { text: 'Cancel', role: 'cancel' },
           ]}
         />
 

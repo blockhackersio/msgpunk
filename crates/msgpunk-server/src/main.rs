@@ -1,10 +1,11 @@
 use std::path::PathBuf;
 use std::sync::Arc;
 
+use actix_cors::Cors;
 use actix_web::{
     delete, get, post,
     web::{self, Data, Json, Path, Query},
-    HttpServer, HttpResponse,
+    HttpServer, HttpResponse, HttpRequest,
 };
 use chrono::Utc;
 use msgpunk_crypto::auth::{timestamp_fresh, verify};
@@ -304,6 +305,112 @@ async fn index() -> HttpResponse {
         .body(include_str!("../templates/index.html"))
 }
 
+#[get("/embed.js")]
+async fn embed_js(req: HttpRequest) -> HttpResponse {
+    let host = req
+        .headers()
+        .get("host")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("localhost:8080");
+    let forwarded_proto = req
+        .headers()
+        .get("x-forwarded-proto")
+        .and_then(|v| v.to_str().ok());
+    let scheme = forwarded_proto
+        .or_else(|| {
+            if req.connection_info().scheme() == "https" {
+                Some("https")
+            } else {
+                Some("http")
+            }
+        })
+        .unwrap_or("https");
+    let origin = format!("{}://{}", scheme, host);
+
+    let js = format!(r#"(function() {{
+  'use strict';
+  var S = "{}";
+
+  var style = document.createElement('style');
+  style.textContent = '.msgpunk-overlay{{position:fixed;inset:0;background:rgba(0,0,0,0.6);opacity:0;pointer-events:none;transition:opacity .25s;z-index:998}}.msgpunk-overlay.open{{opacity:1;pointer-events:auto}}.msgpunk-drawer{{position:fixed;left:0;right:0;bottom:0;height:80vh;background:#000;border-top:.5px solid #888;transform:translateY(100%);transition:transform .3s cubic-bezier(.16,1,.3,1);z-index:999;display:flex;flex-direction:column}}.msgpunk-drawer.open{{transform:translateY(0)}}.msgpunk-drawer-header{{display:flex;align-items:center;justify-content:flex-end;padding:.75rem 1rem}}.msgpunk-drawer-close{{background:none;border:.5px solid #fff;color:#fff;font-family:Victor Mono,monospace;font-size:.875rem;cursor:pointer;padding:.25rem .75rem}}.msgpunk-drawer-close:hover{{background:#fff;color:#000}}.msgpunk-drawer-body{{flex:1;display:flex}}.msgpunk-drawer-body iframe{{width:100%;height:100%;border:none;background:#fff}}';
+  document.head.appendChild(style);
+
+  function openDrawer(formId, password) {{
+    var overlay = document.createElement('div');
+    overlay.className = 'msgpunk-overlay';
+    overlay.onclick = closeDrawer;
+
+    var drawer = document.createElement('div');
+    drawer.className = 'msgpunk-drawer';
+
+    var header = document.createElement('div');
+    header.className = 'msgpunk-drawer-header';
+    var closeBtn = document.createElement('button');
+    closeBtn.className = 'msgpunk-drawer-close';
+    closeBtn.textContent = 'close';
+    closeBtn.onclick = closeDrawer;
+    header.appendChild(closeBtn);
+
+    var body = document.createElement('div');
+    body.className = 'msgpunk-drawer-body';
+    var iframe = document.createElement('iframe');
+    iframe.src = S + '/f/' + formId + '#' + password;
+    iframe.title = 'msgpunk form';
+    body.appendChild(iframe);
+
+    drawer.appendChild(header);
+    drawer.appendChild(body);
+
+    document.body.appendChild(overlay);
+    document.body.appendChild(drawer);
+
+    requestAnimationFrame(function() {{
+      overlay.classList.add('open');
+      drawer.classList.add('open');
+    }});
+
+    document.body.style.overflow = 'hidden';
+  }}
+
+  function closeDrawer() {{
+    var overlay = document.querySelector('.msgpunk-overlay');
+    var drawer = document.querySelector('.msgpunk-drawer');
+    if (overlay) overlay.classList.remove('open');
+    if (drawer) drawer.classList.remove('open');
+    document.body.style.overflow = '';
+    setTimeout(function() {{
+      if (overlay) overlay.remove();
+      if (drawer) drawer.remove();
+    }}, 300);
+  }}
+
+  document.addEventListener('keydown', function(e) {{
+    if (e.key === 'Escape') closeDrawer();
+  }});
+
+  document.addEventListener('DOMContentLoaded', function() {{
+    document.querySelectorAll('.msgpunk-form').forEach(function(el) {{
+      el.addEventListener('click', function(e) {{
+        e.preventDefault();
+        var formId = el.getAttribute('data-form');
+        var password = el.getAttribute('data-password');
+        if (formId && password) openDrawer(formId, password);
+      }});
+    }});
+  }});
+
+  window.MsgPunk = {{
+    openForm: openDrawer,
+    closeForm: closeDrawer,
+  }};
+}})();"#, origin);
+
+    HttpResponse::Ok()
+        .content_type("application/javascript")
+        .insert_header(("Access-Control-Allow-Origin", "*"))
+        .body(js)
+}
+
 #[get("/logo.png")]
 async fn logo() -> HttpResponse {
     HttpResponse::Ok()
@@ -333,6 +440,7 @@ async fn serve_static(path: web::Path<String>) -> HttpResponse {
 fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(healthcheck)
         .service(index)
+        .service(embed_js)
         .service(logo)
         .service(create_form)
         .service(get_form_data)
@@ -358,6 +466,7 @@ async fn main() -> std::io::Result<()> {
             storage: storage.clone(),
         });
         actix_web::App::new()
+            .wrap(Cors::permissive())
             .app_data(state)
             .configure(configure)
     })
