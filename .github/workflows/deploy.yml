@@ -3,11 +3,6 @@ name: Build and push msgpunk-server
 on:
   push:
     branches: [main]
-    paths:
-      - 'crates/msgpunk-server/**'
-      - 'Cargo.toml'
-      - 'Cargo.lock'
-      - 'Dockerfile'
 
 env:
   REGISTRY: ghcr.io
