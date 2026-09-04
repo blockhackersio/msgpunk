@@ -1,6 +1,6 @@
 # Msgpunk
 
-**The only contact form for static sites that makes data brokers weep.**
+**Real punks encrypt their forms.**
 
 ---
 
@@ -64,18 +64,6 @@ The form structure is AES-256-GCM encrypted before it leaves your device. The pa
 - **Web Crypto API** - encryption in the browser, no WASM needed
 - **Tauri v2** - native Android app, not a webview wrapper
 - **React / Ionic** - clean UI for form creation and submission viewing
-
----
-
-## Use It
-
-```bash
-git clone https://github.com/blockhackersio/msgpunk
-cd msgpunk
-docker compose up
-```
-
-Or grab the Android app from the releases page.
 
 ---
 
