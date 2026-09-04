@@ -2,3 +2,5 @@ packages:
   - "packages/*"
 allowBuilds:
   esbuild: false
+overrides:
+  baseline-browser-mapping: 2.11.20
