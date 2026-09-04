@@ -1,0 +1,10 @@
+target/
+.git/
+.devenv/
+.direnv/
+node_modules/
+.pnpm-store/
+.msgpunk/
+devenv.lock
+devenv.nix
+devenv.yaml

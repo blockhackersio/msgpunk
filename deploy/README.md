@@ -26,6 +26,7 @@ curl -fsSL https://get.docker.com | sh
 ```bash
 useradd -m -s /bin/bash deploy
 usermod -aG docker deploy
+cp -r ~/.ssh /home/deploy/.ssh && chown -R deploy:deploy /home/deploy/.ssh
 mkdir -p /home/deploy/msgpunk
 ```
 
@@ -43,8 +44,8 @@ ufw allow 443/tcp
 From your local machine:
 
 ```bash
-scp deploy/docker-compose.yml deploy@<your-server-ip>:/home/deploy/msgpunk/
-scp deploy/Caddyfile deploy@<your-server-ip>:/home/deploy/msgpunk/
+scp deploy/docker-compose.yml deploy@msgpunk.com:/home/deploy/msgpunk/
+scp deploy/Caddyfile deploy@msgpunk.com:/home/deploy/msgpunk/
 ```
 
 ### 6. Configure your domain
@@ -52,7 +53,7 @@ scp deploy/Caddyfile deploy@<your-server-ip>:/home/deploy/msgpunk/
 SSH into the server and edit the Caddyfile:
 
 ```bash
-ssh deploy@<your-server-ip>
+ssh deploy@msgpunk.com
 cd ~/msgpunk
 ```
 
