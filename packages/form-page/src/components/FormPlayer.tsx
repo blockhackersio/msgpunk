@@ -190,7 +190,7 @@ export function FormPlayer({ form, ageRecipient, onSubmit }: FormPlayerProps) {
   if (isSubmitted) {
     return (
       <div
-        className="min-h-screen flex items-center justify-center p-6"
+        className="min-h-dvh flex items-center justify-center p-6"
         style={{
           ...themeStyles,
           backgroundColor: theme.backgroundColor,
@@ -228,7 +228,7 @@ export function FormPlayer({ form, ageRecipient, onSubmit }: FormPlayerProps) {
   if (questions.length === 0) {
     return (
       <div
-        className="min-h-screen flex items-center justify-center p-6"
+        className="min-h-dvh flex items-center justify-center p-6"
         style={{
           backgroundColor: theme.backgroundColor,
           fontFamily: theme.fontFamily,
@@ -259,7 +259,7 @@ export function FormPlayer({ form, ageRecipient, onSubmit }: FormPlayerProps) {
   return (
     <div
       ref={containerRef}
-      className="min-h-screen flex flex-col"
+      className="flex flex-col min-h-dvh"
       style={{
         ...themeStyles,
         backgroundColor: theme.backgroundColor,
@@ -320,8 +320,8 @@ export function FormPlayer({ form, ageRecipient, onSubmit }: FormPlayerProps) {
         </div>
       )}
 
-      <main className="flex-1 flex items-center justify-center p-6 pt-12">
-        <div className="w-full max-w-2xl">
+      <main className="flex-1 flex flex-col p-6 pt-12 pb-24 overflow-y-auto">
+        <div className="w-full max-w-2xl mx-auto">
           <AnimatePresence mode="wait" custom={direction}>
             <motion.div
               key={currentIndex}
