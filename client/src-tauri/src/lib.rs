@@ -586,6 +586,7 @@ async fn get_form_url(
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             let app_data_dir: PathBuf = app
                 .path()

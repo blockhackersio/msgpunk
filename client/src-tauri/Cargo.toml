@@ -29,3 +29,4 @@ rand = "0.8"
 bip39 = "2"
 hex = "0.4"
 age = { version = "0.12", features = ["armor"] }
+tauri-plugin-opener = "2"

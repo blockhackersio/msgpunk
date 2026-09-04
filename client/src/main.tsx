@@ -17,12 +17,13 @@ import '@ionic/react/css/text-transformation.css'
 import '@ionic/react/css/flex-utils.css'
 import '@ionic/react/css/display.css'
 
-/* Theme variables */
-import './theme/variables.css'
 
 /* Palettes */
 import '@ionic/react/css/palettes/dark.always.css'
 import '@ionic/react/css/palettes/high-contrast-dark.always.css'
+
+/* Theme variables */
+import './theme/variables.css'
 
 import App from './App.tsx'
 
@@ -30,6 +31,6 @@ setupIonicReact()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-      <App />
+    <App />
   </StrictMode>,
 )

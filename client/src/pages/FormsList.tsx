@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { invoke } from '@tauri-apps/api/core'
+import { openUrl } from '@tauri-apps/plugin-opener'
 import { SERVER_URL } from '../config'
 import {
   IonPage,
@@ -23,7 +24,7 @@ import {
   IonFab,
   IonFabButton,
 } from '@ionic/react'
-import { settingsOutline, createOutline, trashOutline, add } from 'ionicons/icons'
+import { settingsOutline, createOutline, trashOutline, openOutline, add } from 'ionicons/icons'
 import type { RefresherEventDetail } from '@ionic/react'
 
 interface FormInfo {
@@ -146,6 +147,21 @@ export default function FormsList() {
                   <h2>{form.display_name}</h2>
                   <p>{new Date(form.created_at).toLocaleDateString()}</p>
                 </IonLabel>
+                <IonButton
+                  slot="end"
+                  fill="clear"
+                  onClick={async (e) => {
+                    e.stopPropagation()
+                    try {
+                      const url = await invoke<string>('get_form_url', { formId: form.form_id, serverUrl })
+                      await openUrl(url)
+                    } catch (err) {
+                      setToastMsg(`Failed to open: ${err}`)
+                    }
+                  }}
+                >
+                  <IonIcon icon={openOutline} />
+                </IonButton>
                 <IonButton
                   slot="end"
                   fill="clear"

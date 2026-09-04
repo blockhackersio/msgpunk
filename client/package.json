@@ -13,6 +13,7 @@
     "@ionic/react": "^9.0.1",
     "@ionic/react-router": "^9.0.2",
     "@tauri-apps/api": "^2.0.0",
+    "@tauri-apps/plugin-opener": "^2.5.5",
     "ionicons": "^8.1.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
