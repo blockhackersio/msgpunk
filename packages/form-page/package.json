@@ -9,7 +9,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@dicebear/core": "^9.4.3",
+    "@dicebear/notionists": "^9.0.0",
     "@msgpunk/toolkit": "workspace:*",
+    "@noble/hashes": "^1.7.1",
     "age-encryption": "^0.3.1",
     "framer-motion": "^13.2.0",
     "lucide-react": "^1.40.0",

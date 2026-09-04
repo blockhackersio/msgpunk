@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import type { Form, QuestionConfig, Json } from '../types'
 import { getTheme, getThemeCSSVariables } from '../themes'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -6,6 +6,7 @@ import { Progress } from './ui/Progress'
 import { Button } from './ui/Button'
 import { ChevronUp, ChevronDown, Check, ArrowRight } from 'lucide-react'
 import { QuestionRenderer } from './QuestionRenderer'
+import { generateAvatar } from '../utils/avatar'
 
 interface FormPlayerProps {
   form: Form
@@ -27,6 +28,8 @@ export function FormPlayer({ form, ageRecipient, onSubmit }: FormPlayerProps) {
 
   const containerRef = useRef<HTMLDivElement>(null)
   const skipNextValidationRef = useRef(false)
+
+  const avatarData = useMemo(() => ageRecipient ? generateAvatar(ageRecipient) : null, [ageRecipient])
 
   const currentQuestion = questions[currentIndex]
   const isLastQuestion = currentIndex === questions.length - 1
@@ -273,17 +276,47 @@ export function FormPlayer({ form, ageRecipient, onSubmit }: FormPlayerProps) {
         />
       </div>
 
-      {ageRecipient && (
+      {avatarData && (
         <div
-          className="fixed top-2 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full text-xs font-mono opacity-80"
-          style={{
-            backgroundColor: `${theme.primaryColor}15`,
-            color: theme.primaryColor,
-            border: `1px solid ${theme.primaryColor}30`,
-            maxWidth: '90vw',
-          }}
+          className="fixed top-3 left-1/2 -translate-x-1/2 z-50 group flex flex-col items-center gap-1"
         >
-          Encrypted to: {ageRecipient}
+          <div
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full"
+            style={{
+              backgroundColor: `${theme.primaryColor}15`,
+              border: `1px solid ${theme.primaryColor}30`,
+            }}
+          >
+            <svg className="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: theme.primaryColor }}>
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+            <span className="text-[11px] font-medium" style={{ color: theme.primaryColor }}>
+              E2EE
+            </span>
+            <span className="text-[11px] opacity-40" style={{ color: theme.primaryColor }}>·</span>
+            <div
+              className="w-5 h-5 rounded-full overflow-hidden flex-shrink-0"
+              dangerouslySetInnerHTML={{ __html: avatarData.svg }}
+            />
+            <span
+              className="text-[11px] font-medium"
+              style={{ color: theme.primaryColor }}
+            >
+              {avatarData.slug}
+            </span>
+          </div>
+          <div
+            className="px-3 py-1.5 rounded-lg text-[11px] font-mono opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap"
+            style={{
+              backgroundColor: theme.backgroundColor,
+              color: theme.textColor,
+              border: `1px solid ${theme.primaryColor}30`,
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            }}
+          >
+            {ageRecipient}
+          </div>
         </div>
       )}
 
