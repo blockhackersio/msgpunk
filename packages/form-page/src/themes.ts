@@ -55,6 +55,15 @@ export const themes: Record<ThemePreset, ThemeConfig> = {
     accentColor: '#3F3F46',
     fontFamily: "'Inter', sans-serif",
   },
+  'high-contrast': {
+    id: 'high-contrast',
+    name: 'High Contrast',
+    primaryColor: '#FFFFFF',
+    backgroundColor: '#000000',
+    textColor: '#FFFFFF',
+    accentColor: '#FFFFFF',
+    fontFamily: "'Victor Mono', monospace",
+  },
 }
 
 export function getTheme(preset: ThemePreset): ThemeConfig {

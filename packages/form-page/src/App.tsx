@@ -28,7 +28,7 @@ const TEST_FORM: Form = {
   title: 'Test Form',
   description: 'A test form for development',
   slug: 'test',
-  theme: 'ocean',
+  theme: 'high-contrast',
   thank_you_message: 'Thank you for testing!',
   questions: [
     { id: 'name', type: 'short_text', title: 'What is your name?', required: true, placeholder: 'Enter your name' },

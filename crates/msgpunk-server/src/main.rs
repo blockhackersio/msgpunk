@@ -297,6 +297,20 @@ async fn delete_message(
     }
 }
 
+#[get("/")]
+async fn index() -> HttpResponse {
+    HttpResponse::Ok()
+        .content_type("text/html")
+        .body(include_str!("../templates/index.html"))
+}
+
+#[get("/logo.png")]
+async fn logo() -> HttpResponse {
+    HttpResponse::Ok()
+        .content_type("image/png")
+        .body(include_bytes!("../templates/logo.png").to_vec())
+}
+
 #[get("/f/{path:.*}")]
 async fn serve_static(path: web::Path<String>) -> HttpResponse {
     let path = path.into_inner();
@@ -318,6 +332,8 @@ async fn serve_static(path: web::Path<String>) -> HttpResponse {
 
 fn configure(cfg: &mut web::ServiceConfig) {
     cfg.service(healthcheck)
+        .service(index)
+        .service(logo)
         .service(create_form)
         .service(get_form_data)
         .service(submit_message)
