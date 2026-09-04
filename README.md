@@ -33,7 +33,7 @@ We built a cryptographic wall between your data and the infrastructure that carr
 
 ## How It Works
 
-**1. You create a form** on your phone (Tauri Android app). Enter your BIP-39 seed phrase - the *only* key you'll ever need. Design your form. Hit publish.
+**1. You create a form** on your phone (Tauri Android app). Generate your BIP-39 seed phrase - the *only* key you'll ever need. Design your form. Hit publish. Don't lose your seed, which you wont - you're a punk.
 
 The form structure is AES-256-GCM encrypted before it leaves your device. The password lives in the URL hash fragment - the part the browser never sends over the wire.
 
