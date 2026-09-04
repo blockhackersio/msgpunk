@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">"msgpunk-app"</string>
-    <string name="main_activity_title">"msgpunk-app"</string>
+    <string name="app_name">"msgpunk"</string>
+    <string name="main_activity_title">"msgpunk"</string>
 </resources>
