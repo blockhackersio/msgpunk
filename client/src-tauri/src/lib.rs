@@ -199,7 +199,7 @@ async fn create_form(
     let recipient_str = keys.age_recipient.to_string();
     let form_id = compute_form_id(&recipient_str, key_index);
 
-    let form_structure = r#"{"id":"form","title":"New Form","description":null,"slug":"new-form","theme":"ocean","thank_you_message":"Thank you for your submission!","questions":[{"id":"signal","type":"short_text","title":"Signal Account","required":true,"placeholder":false},{"id":"name","type":"short_text","title":"What should I call you?","required":true,"placeholder":false},{"id":"message","type":"long_text","title":"Your Message","required":true,"placeholder":false}]}"#;
+    let form_structure = r#"{"id":"form","title":"New Form","description":null,"slug":"new-form","theme":"high-contrast","thank_you_message":"Thank you for your submission!","questions":[{"id":"signal","type":"short_text","title":"Signal Account","required":true,"placeholder":false},{"id":"name","type":"short_text","title":"What should I call you?","required":true,"placeholder":false},{"id":"message","type":"long_text","title":"Your Message","required":true,"placeholder":false}]}"#;
 
     let (encrypted_b64, encrypted_password, password) =
         msgpunk_crypto::encryption::encrypt_form_structure(form_structure, &recipient_str);
