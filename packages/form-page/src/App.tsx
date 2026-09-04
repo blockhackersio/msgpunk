@@ -85,7 +85,6 @@ export default function App() {
         const encrypted = base64ToBytes(data.encrypted_structure)
         const decrypted = decrypt(key, encrypted)
         const formObj = JSON.parse(decrypted) as Form
-        console.log({ formObj });
         setState({ status: 'loaded', form: formObj, ageRecipient: data.age_recipient, formId })
       })
       .catch((err: unknown) => {
