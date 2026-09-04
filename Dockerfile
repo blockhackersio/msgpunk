@@ -4,9 +4,9 @@ WORKDIR /app
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY packages/toolkit/ packages/toolkit/
 COPY packages/form-page/ packages/form-page/
-COPY crates/msgpunk-server/static/ crates/msgpunk-server/static/
 RUN pnpm install --frozen-lockfile
 RUN pnpm build
+COPY crates/msgpunk-server/static/ crates/msgpunk-server/static/
 
 FROM rust:alpine AS build
 RUN apk add --no-cache musl-dev pkgconfig openssl-dev
