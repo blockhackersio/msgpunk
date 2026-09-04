@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+kbd {
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  border: 1px solid currentColor;
+  opacity: 0.6;
+  font-size: 0.75rem;
+}

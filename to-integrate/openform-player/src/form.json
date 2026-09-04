@@ -1,0 +1,48 @@
+{
+  "id": "sample-form-1",
+  "title": "Customer Feedback",
+  "description": "Help us improve our service",
+  "slug": "customer-feedback",
+  "theme": "ocean",
+  "thank_you_message": "Thank you for your feedback!",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "short_text",
+      "title": "What is your name?",
+      "description": "Please enter your full name",
+      "required": true,
+      "placeholder": "John Doe"
+    },
+    {
+      "id": "q2",
+      "type": "email",
+      "title": "What is your email address?",
+      "required": true,
+      "placeholder": "john@example.com"
+    },
+    {
+      "id": "q3",
+      "type": "rating",
+      "title": "How would you rate our service?",
+      "description": "1 = Poor, 5 = Excellent",
+      "required": true,
+      "minValue": 1,
+      "maxValue": 5
+    },
+    {
+      "id": "q4",
+      "type": "yes_no",
+      "title": "Would you recommend us to a friend?",
+      "required": true
+    },
+    {
+      "id": "q5",
+      "type": "long_text",
+      "title": "Any additional comments?",
+      "description": "Tell us what we can improve",
+      "required": false,
+      "placeholder": "Share your thoughts..."
+    }
+  ]
+}
