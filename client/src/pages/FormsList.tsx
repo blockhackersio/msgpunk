@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { invoke } from '@tauri-apps/api/core'
+import { SERVER_URL } from '../config'
 import {
   IonPage,
   IonHeader,
@@ -44,7 +45,8 @@ export default function FormsList() {
   const [toastMsg, setToastMsg] = useState('')
   const [loading, setLoading] = useState(true)
 
-  const serverUrl = import.meta.env.VITE_MSGPUNK_SERVER_URL
+
+  const serverUrl = SERVER_URL
 
   const loadForms = useCallback(async () => {
     try {

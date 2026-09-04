@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { invoke } from '@tauri-apps/api/core'
+import { SERVER_URL } from '../config'
 import {
   IonPage,
   IonHeader,
@@ -36,7 +37,7 @@ export default function RepliesList() {
   const [toastMsg, setToastMsg] = useState('')
   const [formUrl, setFormUrl] = useState('')
 
-  const serverUrl = import.meta.env.VITE_MSGPUNK_SERVER_URL
+  const serverUrl = SERVER_URL
 
   const loadReplies = useCallback(async () => {
     if (!serverUrl) {
@@ -61,7 +62,7 @@ export default function RepliesList() {
     if (!serverUrl || !formId) return
     invoke<string>('get_form_url', { formId, serverUrl })
       .then(setFormUrl)
-      .catch(() => {})
+      .catch(() => { })
   }, [formId, serverUrl])
 
   async function handleDelete() {

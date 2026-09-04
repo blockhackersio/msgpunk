@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { SERVER_URL } from '../config'
 import { invoke } from '@tauri-apps/api/core'
 import {
   IonPage,
@@ -38,7 +39,7 @@ export default function ReplyDetail() {
   const [loading, setLoading] = useState(true)
   const [toastMsg, setToastMsg] = useState('')
 
-  const serverUrl = import.meta.env.VITE_MSGPUNK_SERVER_URL
+  const serverUrl = SERVER_URL
 
   useEffect(() => {
     if (!serverUrl) {
