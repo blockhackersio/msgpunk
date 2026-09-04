@@ -4,7 +4,10 @@ on:
   push:
     branches: [main]
     paths:
-      - 'msgpunk-server/**'
+      - 'crates/msgpunk-server/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'Dockerfile'
 
 env:
   REGISTRY: ghcr.io
@@ -30,6 +33,6 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
-          context: msgpunk-server
+          context: .
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
