@@ -1,6 +1,10 @@
-# Msgpunk
+<div align="center">
+  <img src="msgpunk.png" alt="Msgpunk logo" width="200">
+
+# `Msgpunk`
 
 **Real punks encrypt their forms.**
+</div>
 
 ---
 
