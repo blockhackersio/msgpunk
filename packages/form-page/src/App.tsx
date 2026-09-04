@@ -146,5 +146,5 @@ export default function App() {
     )
   }
 
-  return <FormPlayer form={state.form} onSubmit={handleSubmit} />
+  return <FormPlayer form={state.form} ageRecipient={state.ageRecipient} onSubmit={handleSubmit} />
 }

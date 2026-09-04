@@ -9,10 +9,11 @@ import { QuestionRenderer } from './QuestionRenderer'
 
 interface FormPlayerProps {
   form: Form
+  ageRecipient: string
   onSubmit: (answers: Record<string, Json>) => Promise<void>
 }
 
-export function FormPlayer({ form, onSubmit }: FormPlayerProps) {
+export function FormPlayer({ form, ageRecipient, onSubmit }: FormPlayerProps) {
   const questions = (form.questions as QuestionConfig[]) || []
   const theme = getTheme(form.theme)
   const themeStyles = getThemeCSSVariables(theme)
@@ -271,6 +272,20 @@ export function FormPlayer({ form, onSubmit }: FormPlayerProps) {
           }}
         />
       </div>
+
+      {ageRecipient && (
+        <div
+          className="fixed top-2 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full text-xs font-mono opacity-80"
+          style={{
+            backgroundColor: `${theme.primaryColor}15`,
+            color: theme.primaryColor,
+            border: `1px solid ${theme.primaryColor}30`,
+            maxWidth: '90vw',
+          }}
+        >
+          Encrypted to: {ageRecipient}
+        </div>
+      )}
 
       <main className="flex-1 flex items-center justify-center p-6 pt-12">
         <div className="w-full max-w-2xl">
