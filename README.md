@@ -104,7 +104,7 @@ pnpm install && pnpm build
 cargo run
 ```
 
-### Client (Android / Desktop)
+### Client (Android)
 
 ```bash
 cd client
@@ -117,9 +117,6 @@ pnpm install
 
 # Run on a connected Android device
 cargo tauri android dev
-
-# Run as a desktop webview app (for testing IPC without a device)
-cargo tauri dev
 
 # Run browser-only with mock data (no Tauri IPC)
 pnpm dev
@@ -140,7 +137,6 @@ The client devenv defines:
 | Command | What it does |
 |---|---|
 | `dev-android` | `cargo tauri android dev` |
-| `dev-tauri` | `cargo tauri dev` |
 | `dev-browser` | `pnpm dev` |
 | `build-android` | `cargo tauri android build --apk` |
 
