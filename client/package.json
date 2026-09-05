@@ -10,8 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@dicebear/core": "^9.4.3",
+    "@dicebear/notionists": "^9.0.0",
     "@ionic/react": "^9.0.1",
     "@ionic/react-router": "^9.0.2",
+    "@noble/hashes": "^1.8.0",
     "@tauri-apps/api": "^2.0.0",
     "@tauri-apps/plugin-opener": "^2.5.5",
     "ionicons": "^8.1.0",

@@ -1,8 +1,9 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { invoke } from '@tauri-apps/api/core'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { SERVER_URL } from '../config'
+import { generateAvatar } from '../utils/avatar'
 import {
   IonPage,
   IonHeader,
@@ -31,6 +32,7 @@ interface FormInfo {
   form_id: string
   display_name: string
   key_index: number
+  age_recipient: string
   created_at: string
 }
 
@@ -45,6 +47,14 @@ export default function FormsList() {
   const [deleteTarget, setDeleteTarget] = useState<FormInfo | null>(null)
   const [toastMsg, setToastMsg] = useState('')
   const [loading, setLoading] = useState(true)
+
+  const avatars = useMemo(() => {
+    const map = new Map<string, ReturnType<typeof generateAvatar>>()
+    for (const form of forms) {
+      map.set(form.form_id, generateAvatar(form.age_recipient))
+    }
+    return map
+  }, [forms])
 
 
   const serverUrl = SERVER_URL
@@ -137,15 +147,28 @@ export default function FormsList() {
           </div>
         ) : (
           <IonList>
-            {forms.map((form) => (
+            {forms.map((form) => {
+              const avatar = avatars.get(form.form_id)!
+              return (
               <IonItem
                 key={form.form_id}
                 onClick={() => navigate(`/forms/${form.form_id}/replies`)}
                 style={{ cursor: 'pointer' }}
               >
+                <div
+                  slot="start"
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    overflow: 'hidden',
+                    flexShrink: 0,
+                  }}
+                  dangerouslySetInnerHTML={{ __html: avatar.svg }}
+                />
                 <IonLabel>
                   <h2>{form.display_name}</h2>
-                  <p>{new Date(form.created_at).toLocaleDateString()}</p>
+                  <p>{avatar.slug}</p>
                 </IonLabel>
                 <IonButton
                   slot="end"
@@ -186,7 +209,8 @@ export default function FormsList() {
                   <IonIcon icon={trashOutline} />
                 </IonButton>
               </IonItem>
-            ))}
+              )
+            })}
           </IonList>
         )}
 

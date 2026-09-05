@@ -21,6 +21,7 @@ fn init_db(app_data_dir: &std::path::Path) -> Connection {
             form_id TEXT PRIMARY KEY,
             display_name TEXT NOT NULL,
             key_index INTEGER NOT NULL,
+            age_recipient TEXT NOT NULL,
             created_at TEXT NOT NULL
         );",
     )
@@ -144,6 +145,7 @@ struct FormInfo {
     form_id: String,
     display_name: String,
     key_index: u32,
+    age_recipient: String,
     created_at: String,
 }
 
@@ -151,7 +153,7 @@ struct FormInfo {
 async fn list_forms(state: State<'_, Db>) -> Result<Vec<FormInfo>, String> {
     let db = state.0.lock().map_err(|e| e.to_string())?;
     let mut stmt = db
-        .prepare("SELECT form_id, display_name, key_index, created_at FROM forms ORDER BY created_at DESC")
+        .prepare("SELECT form_id, display_name, key_index, age_recipient, created_at FROM forms ORDER BY created_at DESC")
         .map_err(|e| e.to_string())?;
     let rows = stmt
         .query_map([], |row| {
@@ -159,7 +161,8 @@ async fn list_forms(state: State<'_, Db>) -> Result<Vec<FormInfo>, String> {
                 form_id: row.get(0)?,
                 display_name: row.get(1)?,
                 key_index: row.get(2)?,
-                created_at: row.get(3)?,
+                age_recipient: row.get(3)?,
+                created_at: row.get(4)?,
             })
         })
         .map_err(|e| e.to_string())?;
@@ -242,8 +245,8 @@ async fn create_form(
     {
         let db = state.0.lock().map_err(|e| e.to_string())?;
         db.execute(
-            "INSERT INTO forms (form_id, display_name, key_index, created_at) VALUES (?1, ?2, ?3, ?4)",
-            rusqlite::params![form_id, display_name, key_index, now],
+            "INSERT INTO forms (form_id, display_name, key_index, age_recipient, created_at) VALUES (?1, ?2, ?3, ?4, ?5)",
+            rusqlite::params![form_id, display_name, key_index, recipient_str, now],
         )
         .map_err(|e| e.to_string())?;
         set_key_index(&db, key_index + 1)?;

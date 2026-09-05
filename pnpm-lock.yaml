@@ -23,9 +23,6 @@ importers:
 
   packages/form-page:
     dependencies:
-      '@dicebear/avataaars':
-        specifier: ^6.0.8
-        version: 6.3.0(@dicebear/core@9.4.3)
       '@dicebear/core':
         specifier: ^9.4.3
         version: 9.4.3
@@ -185,12 +182,6 @@ packages:
   '@babel/types@7.29.8':
     resolution: {integrity: sha512-Vj1jF3cPfxg7OAfoI7QnVKLoILlm2JF9pnVHrX8qx7AHMiYWT+NDAA7jChlNgRS4WTLc/fD1lXLmPixluj+3Gg==}
     engines: {node: '>=6.9.0'}
-
-  '@dicebear/avataaars@6.3.0':
-    resolution: {integrity: sha512-FwD/PWoSzplZ+laxvSo7C/Unj6Wir+1i3LizgmKQ5F06bMiQuR741OgD/iHjgZRoyoEBvuiROGyxUU6Ms0WC1g==}
-    engines: {node: '>=16.0.0'}
-    peerDependencies:
-      '@dicebear/core': ^6.0.0
 
   '@dicebear/core@9.4.3':
     resolution: {integrity: sha512-9ITrQI57k3p5hKuU8HZJ1d0kPdrmTKEJDOdlKQ8CpaChbtmnD1R+dtWmNz5IesYThXM8F64pJ0ZvJ2rsY8Hciw==}
@@ -1466,10 +1457,6 @@ snapshots:
     dependencies:
       '@babel/helper-string-parser': 7.29.7
       '@babel/helper-validator-identifier': 7.29.7
-
-  '@dicebear/avataaars@6.3.0(@dicebear/core@9.4.3)':
-    dependencies:
-      '@dicebear/core': 9.4.3
 
   '@dicebear/core@9.4.3':
     dependencies:
