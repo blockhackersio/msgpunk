@@ -8,6 +8,18 @@
 
 ---
 
+## The Pitch
+
+> Every day, millions of people fill out forms on static sites. Every submission is a data point sold to the highest bidder. Msgpunk makes that impossible.
+>
+> We don't need a privacy policy. We don't need a "we value your privacy" banner. We need cryptography - and we ship it.
+>
+> This is the form service for the post-Snowden web. Stateless. Server-blind. Client-side keys.
+>
+> **Your data. Your keys. Your rules.**
+
+---
+
 ## The Problem
 
 Static sites don't have a built-in way to accept form submissions. Existing solutions all require tradeoffs:
@@ -131,13 +143,4 @@ The client devenv defines:
 | `dev-tauri` | `cargo tauri dev` |
 | `dev-browser` | `pnpm dev` |
 | `build-android` | `cargo tauri android build --apk` |
-
-> Every day, millions of people fill out forms on static sites. Every submission is a data point sold to the highest bidder. Msgpunk makes that impossible.
->
-> We don't need a privacy policy. We don't need a "we value your privacy" banner. We need cryptography - and we ship it.
->
-> This is the form service for the post-Snowden web. Stateless. Server-blind. Client-side keys.
->
-> **Your data. Your keys. Your rules.**
-
 
