@@ -72,7 +72,65 @@ The form structure is AES-256-GCM encrypted before it leaves your device. The pa
 
 ---
 
-## The Pitch
+## Compiling and Running from Source
+
+### Prerequisites
+
+- [Nix](https://determinate.systems/nix-installer/) with [devenv](https://devenv.sh/getting-started/)
+- `direnv` (optional, for automatic shell activation)
+
+### Server (root)
+
+```bash
+# Enter the development environment
+devenv shell
+
+# Install JS dependencies and build form-page/toolkit packages
+pnpm install && pnpm build
+
+# Run the Actix-web server
+cargo run
+```
+
+### Client (Android / Desktop)
+
+```bash
+cd client
+
+# Enter the client development environment (includes Rust with Android targets, JDK 17, Android SDK/NDK, cargo-tauri)
+devenv shell
+
+# Install JS dependencies
+pnpm install
+
+# Run on a connected Android device
+cargo tauri android dev
+
+# Run as a desktop webview app (for testing IPC without a device)
+cargo tauri dev
+
+# Run browser-only with mock data (no Tauri IPC)
+pnpm dev
+```
+
+### Shortcuts (with devenv active)
+
+The root devenv defines convenience scripts:
+
+| Command | What it does |
+|---|---|
+| `cr` | `cargo run` |
+| `cb` | `cargo build` |
+| `ct` | `cargo test` |
+
+The client devenv defines:
+
+| Command | What it does |
+|---|---|
+| `dev-android` | `cargo tauri android dev` |
+| `dev-tauri` | `cargo tauri dev` |
+| `dev-browser` | `pnpm dev` |
+| `build-android` | `cargo tauri android build --apk` |
 
 > Every day, millions of people fill out forms on static sites. Every submission is a data point sold to the highest bidder. Msgpunk makes that impossible.
 >
