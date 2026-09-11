@@ -19,13 +19,15 @@ import {
   IonModal,
   IonInput,
   IonToast,
-  IonAlert,
   IonRefresher,
   IonRefresherContent,
   IonFab,
   IonFabButton,
+  IonCard,
+  IonCardContent,
+  IonText,
 } from '@ionic/react'
-import { settingsOutline, createOutline, trashOutline, openOutline, add } from 'ionicons/icons'
+import { settingsOutline, openOutline, add, copyOutline, closeOutline } from 'ionicons/icons'
 import type { RefresherEventDetail } from '@ionic/react'
 
 interface FormInfo {
@@ -40,13 +42,11 @@ export default function FormsList() {
   const navigate = useNavigate()
   const [forms, setForms] = useState<FormInfo[]>([])
   const [showAddModal, setShowAddModal] = useState(false)
-  const [showEditModal, setShowEditModal] = useState(false)
-  const [editingForm, setEditingForm] = useState<FormInfo | null>(null)
   const [newName, setNewName] = useState('')
-  const [editName, setEditName] = useState('')
-  const [deleteTarget, setDeleteTarget] = useState<FormInfo | null>(null)
   const [toastMsg, setToastMsg] = useState('')
   const [loading, setLoading] = useState(true)
+  const [identityTarget, setIdentityTarget] = useState<FormInfo | null>(null)
+  const [copiedKey, setCopiedKey] = useState(false)
 
   const avatars = useMemo(() => {
     const map = new Map<string, ReturnType<typeof generateAvatar>>()
@@ -90,36 +90,18 @@ export default function FormsList() {
     }
   }
 
-  async function handleRename() {
-    if (!editingForm || !editName.trim()) return
-    try {
-      await invoke('rename_form', { formId: editingForm.form_id, displayName: editName.trim() })
-      setShowEditModal(false)
-      setEditingForm(null)
-      await loadForms()
-    } catch (e) {
-      setToastMsg(`Failed: ${e}`)
-    }
-  }
-
-  async function handleDelete() {
-    if (!deleteTarget) return
-    if (!serverUrl) {
-      setToastMsg('VITE_MSGPUNK_SERVER_URL not set')
-      return
-    }
-    try {
-      await invoke('delete_form', { formId: deleteTarget.form_id, serverUrl })
-      setDeleteTarget(null)
-      await loadForms()
-      setToastMsg('Form deleted')
-    } catch (e) {
-      setToastMsg(`Failed: ${e}`)
-    }
-  }
-
   function handleRefresh(e: CustomEvent<RefresherEventDetail>) {
     loadForms().then(() => e.detail.complete())
+  }
+
+  async function handleCopyKey(key: string) {
+    try {
+      await navigator.clipboard.writeText(key)
+      setCopiedKey(true)
+      setTimeout(() => setCopiedKey(false), 2000)
+    } catch {
+      // ignore
+    }
   }
 
   return (
@@ -163,6 +145,11 @@ export default function FormsList() {
                     borderRadius: '50%',
                     overflow: 'hidden',
                     flexShrink: 0,
+                    cursor: 'pointer',
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setIdentityTarget(form)
                   }}
                   dangerouslySetInnerHTML={{ __html: avatar.svg }}
                 />
@@ -184,29 +171,6 @@ export default function FormsList() {
                   }}
                 >
                   <IonIcon icon={openOutline} />
-                </IonButton>
-                <IonButton
-                  slot="end"
-                  fill="clear"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setEditingForm(form)
-                    setEditName(form.display_name)
-                    setShowEditModal(true)
-                  }}
-                >
-                  <IonIcon icon={createOutline} />
-                </IonButton>
-                <IonButton
-                  slot="end"
-                  fill="clear"
-                  color="danger"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setDeleteTarget(form)
-                  }}
-                >
-                  <IonIcon icon={trashOutline} />
                 </IonButton>
               </IonItem>
               )
@@ -245,41 +209,6 @@ export default function FormsList() {
           </IonContent>
         </IonModal>
 
-        <IonModal isOpen={showEditModal} onDidDismiss={() => { setShowEditModal(false); setEditingForm(null) }}>
-          <IonHeader>
-            <IonToolbar>
-              <IonTitle>Rename Form</IonTitle>
-              <IonButtons slot="end">
-                <IonButton onClick={() => setShowEditModal(false)}>Cancel</IonButton>
-              </IonButtons>
-            </IonToolbar>
-          </IonHeader>
-          <IonContent className="ion-padding">
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', paddingTop: '16px' }}>
-              <IonInput
-                label="Display Name"
-                labelPlacement="stacked"
-                value={editName}
-                onIonInput={(e) => setEditName(e.detail.value ?? '')}
-              />
-              <IonButton onClick={handleRename} disabled={!editName.trim()}>
-                Save
-              </IonButton>
-            </div>
-          </IonContent>
-        </IonModal>
-
-        <IonAlert
-          isOpen={!!deleteTarget}
-          onDidDismiss={() => setDeleteTarget(null)}
-          header="Delete Form?"
-          message={`Delete "${deleteTarget?.display_name}" and all its messages? This cannot be undone.`}
-          buttons={[
-            { text: 'Cancel', role: 'cancel' },
-            { text: 'Delete', role: 'destructive', handler: handleDelete },
-          ]}
-        />
-
         <IonToast
           isOpen={!!toastMsg}
           message={toastMsg}
@@ -287,6 +216,77 @@ export default function FormsList() {
           buttons={[{ text: 'Dismiss', role: 'cancel' }]}
           onDidDismiss={() => setToastMsg('')}
         />
+
+        <IonModal
+          isOpen={!!identityTarget}
+          onDidDismiss={() => { setIdentityTarget(null); setCopiedKey(false) }}
+        >
+          {identityTarget && (() => {
+            const av = generateAvatar(identityTarget.age_recipient)
+            return (
+              <>
+                <IonHeader>
+                  <IonToolbar>
+                    <IonButtons slot="end">
+                      <IonButton onClick={() => { setIdentityTarget(null); setCopiedKey(false) }}>
+                        <IonIcon icon={closeOutline} />
+                      </IonButton>
+                    </IonButtons>
+                    <IonTitle>Identity</IonTitle>
+                  </IonToolbar>
+                </IonHeader>
+                <IonContent className="ion-padding">
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '24px', paddingTop: '24px' }}>
+                    <div
+                      style={{
+                        width: '120px',
+                        height: '120px',
+                        borderRadius: '50%',
+                        overflow: 'hidden',
+                      }}
+                      dangerouslySetInnerHTML={{ __html: av.svg }}
+                    />
+                    <IonText>
+                      <h2 style={{ textAlign: 'center', margin: 0 }}>{av.slug}</h2>
+                    </IonText>
+                    <IonCard style={{ width: '100%' }}>
+                      <IonCardContent style={{ position: 'relative' }}>
+                        <pre style={{
+                          fontSize: '13px',
+                          lineHeight: '1.5',
+                          wordBreak: 'break-all',
+                          whiteSpace: 'pre-wrap',
+                          fontFamily: 'monospace',
+                          margin: 0,
+                          paddingRight: '32px',
+                        }}>
+                          {identityTarget.age_recipient}
+                        </pre>
+                        <IonButton
+                          onClick={() => handleCopyKey(identityTarget.age_recipient)}
+                          fill="clear"
+                          size="small"
+                          style={{ position: 'absolute', top: '4px', right: '4px', margin: 0 }}
+                        >
+                          <IonIcon icon={copyOutline} slot="icon-only" />
+                        </IonButton>
+                      </IonCardContent>
+                    </IonCard>
+                    {copiedKey && (
+                      <IonText color="success" style={{ fontSize: '13px' }}>
+                        Age key copied to clipboard!
+                      </IonText>
+                    )}
+                    <IonText color="medium" style={{ textAlign: 'center', fontSize: '13px' }}>
+                      This is the public encryption key for <strong>{identityTarget.display_name}</strong>.
+                      Share it so others can send you encrypted messages.
+                    </IonText>
+                  </div>
+                </IonContent>
+              </>
+            )
+          })()}
+        </IonModal>
       </IonContent>
     </IonPage>
   )

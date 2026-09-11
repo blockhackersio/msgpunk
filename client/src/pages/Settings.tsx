@@ -14,14 +14,17 @@ import {
   IonCardContent,
   IonLoading,
   IonText,
+  IonAlert,
 } from '@ionic/react'
-import { arrowBack, copyOutline } from 'ionicons/icons'
+import { arrowBack, copyOutline, trashOutline } from 'ionicons/icons'
 
 export default function Settings() {
   const navigate = useNavigate()
   const [phrase, setPhrase] = useState('')
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     invoke<string>('get_seed_phrase')
@@ -41,6 +44,17 @@ export default function Settings() {
     } catch {
       // ignore
     }
+  }
+
+  async function handleDelete() {
+    setDeleting(true)
+    try {
+      await invoke('reset_storage')
+      navigate('/', { replace: true })
+    } catch (e) {
+      console.error('reset_storage failed:', e)
+    }
+    setDeleting(false)
   }
 
   return (
@@ -98,8 +112,31 @@ export default function Settings() {
                 Copied to clipboard!
               </IonText>
             )}
+
+            <div style={{ marginTop: '32px' }}>
+              <IonButton
+                onClick={() => setShowDeleteAlert(true)}
+                color="danger"
+                fill="outline"
+                disabled={deleting}
+              >
+                <IonIcon icon={trashOutline} slot="start" />
+                Delete Seed Phrase & Reset
+              </IonButton>
+            </div>
             </div>
         )}
+
+        <IonAlert
+          isOpen={showDeleteAlert}
+          onDidDismiss={() => setShowDeleteAlert(false)}
+          header="Delete seed phrase?"
+          message="This will permanently delete your seed phrase and all saved forms. Make sure you have backed up your seed phrase before proceeding."
+          buttons={[
+            { text: 'Cancel', role: 'cancel' },
+            { text: 'Delete Everything', role: 'destructive', handler: handleDelete },
+          ]}
+        />
       </IonContent>
     </IonPage>
   )

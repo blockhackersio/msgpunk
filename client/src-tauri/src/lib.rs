@@ -157,6 +157,17 @@ async fn import_seed(state: State<'_, Db>, phrase: String) -> Result<String, Str
 }
 
 #[tauri::command]
+async fn reset_storage(state: State<'_, Db>) -> Result<(), String> {
+    let db = state.0.lock().map_err(|e| e.to_string())?;
+    db.execute_batch(
+        "DELETE FROM settings;
+         DELETE FROM forms;",
+    )
+    .map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+#[tauri::command]
 async fn get_seed_phrase(state: State<'_, Db>) -> Result<String, String> {
     let db = state.0.lock().map_err(|e| e.to_string())?;
     get_seed(&db)
@@ -169,6 +180,25 @@ struct FormInfo {
     key_index: u32,
     age_recipient: String,
     created_at: String,
+}
+
+#[tauri::command]
+async fn get_form(state: State<'_, Db>, form_id: String) -> Result<FormInfo, String> {
+    let db = state.0.lock().map_err(|e| e.to_string())?;
+    db.query_row(
+        "SELECT form_id, display_name, key_index, age_recipient, created_at FROM forms WHERE form_id = ?1",
+        [&form_id],
+        |row| {
+            Ok(FormInfo {
+                form_id: row.get(0)?,
+                display_name: row.get(1)?,
+                key_index: row.get(2)?,
+                age_recipient: row.get(3)?,
+                created_at: row.get(4)?,
+            })
+        },
+    )
+    .map_err(|e| format!("form not found: {}", e))
 }
 
 #[tauri::command]
@@ -633,7 +663,9 @@ pub fn run() {
             is_onboarded,
             generate_seed,
             import_seed,
+            reset_storage,
             get_seed_phrase,
+            get_form,
             list_forms,
             rename_form,
             create_form,
