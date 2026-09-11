@@ -135,6 +135,28 @@ async fn generate_seed(state: State<'_, Db>) -> Result<String, String> {
 }
 
 #[tauri::command]
+async fn import_seed(state: State<'_, Db>, phrase: String) -> Result<String, String> {
+    let phrase = phrase.trim().to_string();
+
+    // Validate it's a proper BIP-39 mnemonic
+    bip39::Mnemonic::parse(&phrase).map_err(|e| format!("invalid seed phrase: {}", e))?;
+
+    let db = state.0.lock().map_err(|e| e.to_string())?;
+    db.execute(
+        "INSERT OR REPLACE INTO settings (key, value) VALUES ('seed_phrase', ?1)",
+        [&phrase],
+    )
+    .map_err(|e| e.to_string())?;
+    db.execute(
+        "INSERT OR REPLACE INTO settings (key, value) VALUES ('last_key_index', '0')",
+        [],
+    )
+    .map_err(|e| e.to_string())?;
+
+    Ok(phrase)
+}
+
+#[tauri::command]
 async fn get_seed_phrase(state: State<'_, Db>) -> Result<String, String> {
     let db = state.0.lock().map_err(|e| e.to_string())?;
     get_seed(&db)
@@ -610,6 +632,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             is_onboarded,
             generate_seed,
+            import_seed,
             get_seed_phrase,
             list_forms,
             rename_form,

@@ -15,12 +15,13 @@ import {
   IonLoading,
   IonText,
 } from '@ionic/react'
-import { arrowBack } from 'ionicons/icons'
+import { arrowBack, copyOutline } from 'ionicons/icons'
 
 export default function Settings() {
   const navigate = useNavigate()
   const [phrase, setPhrase] = useState('')
   const [loading, setLoading] = useState(true)
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     invoke<string>('get_seed_phrase')
@@ -31,6 +32,16 @@ export default function Settings() {
       })
       .finally(() => setLoading(false))
   }, [])
+
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(phrase)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      // ignore
+    }
+  }
 
   return (
     <IonPage>
@@ -57,7 +68,7 @@ export default function Settings() {
             </IonText>
 
             <IonCard>
-              <IonCardContent>
+              <IonCardContent style={{ position: 'relative' }}>
                 <pre
                   style={{
                     fontSize: '14px',
@@ -67,12 +78,26 @@ export default function Settings() {
                     fontFamily: 'monospace',
                     userSelect: 'all',
                     margin: 0,
+                    paddingRight: '32px',
                   }}
                 >
                   {phrase}
                 </pre>
+                <IonButton
+                  onClick={handleCopy}
+                  fill="clear"
+                  size="small"
+                  style={{ position: 'absolute', top: '4px', right: '4px', margin: 0 }}
+                >
+                  <IonIcon icon={copyOutline} slot="icon-only" />
+                </IonButton>
               </IonCardContent>
             </IonCard>
+            {copied && (
+              <IonText color="success" style={{ fontSize: '13px' }}>
+                Copied to clipboard!
+              </IonText>
+            )}
             </div>
         )}
       </IonContent>
